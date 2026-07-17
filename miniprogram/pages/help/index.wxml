@@ -1,0 +1,24 @@
+<view class="page">
+  <view wx:if="{{loading}}">
+    <view class="skeleton"></view>
+    <view class="skeleton" style="margin-top:20rpx"></view>
+  </view>
+  <view wx:elif="{{error}}" class="state">
+    加载失败
+    <button size="mini" bindtap="load">重试</button>
+  </view>
+  <block wx:else>
+    <view class="card">
+      <view class="title">帮助与规则</view>
+      <view class="muted">奖励只来自真实、已结算、未退款订单；不收取入门费、代理费，不按发展人数计酬。</view>
+    </view>
+    <view wx:for="{{items}}" wx:key="key" class="card">
+      <view>{{item.title}}</view>
+      <view class="muted">{{item.content}}</view>
+    </view>
+    <view wx:if="{{items.length === 0}}" class="card">
+      <view>隐私政策</view>
+      <view class="muted">仅收集完成登录、订单归因和提现所必需的信息。</view>
+    </view>
+  </block>
+</view>

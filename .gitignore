@@ -1,0 +1,13 @@
+.DS_Store
+.idea/
+.vscode/
+*.iml
+.env
+**/.env
+backend/target/
+admin-web/node_modules/
+admin-web/dist/
+miniprogram/node_modules/
+miniprogram/miniprogram_npm/
+*.log
+coverage/

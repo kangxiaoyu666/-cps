@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "pages/home/index", "pages/meituan/index", "pages/eleme/index", "pages/eatwhat/index",
+    "pages/profile/index", "pages/orders/index", "pages/wallet/index", "pages/invitations/index",
+    "pages/withdrawals/index", "pages/profile-edit/index", "pages/help/index"
+  ],
+  "window": {"navigationBarTitleText":"外卖省心领","navigationBarBackgroundColor":"#ffffff","navigationBarTextStyle":"black","backgroundColor":"#f6f6f2"},
+  "tabBar": {"color":"#9b9b9b","selectedColor":"#d84b35","backgroundColor":"#ffffff","list":[
+    {"pagePath":"pages/home/index","text":"领红包","iconPath":"assets/legacy/menu_imgs/wm.png","selectedIconPath":"assets/legacy/menu_imgs/wm_selected.png"},
+    {"pagePath":"pages/meituan/index","text":"美团","iconPath":"assets/legacy/menu_imgs/mt.png","selectedIconPath":"assets/legacy/menu_imgs/mt_selected.png"},
+    {"pagePath":"pages/eatwhat/index","text":"吃什么","iconPath":"assets/legacy/menu_imgs/eat_what.png","selectedIconPath":"assets/legacy/menu_imgs/eat_what_selected.png"},
+    {"pagePath":"pages/eleme/index","text":"饿了么","iconPath":"assets/legacy/menu_imgs/ele.png","selectedIconPath":"assets/legacy/menu_imgs/ele_selected.png"},
+    {"pagePath":"pages/profile/index","text":"我的","iconPath":"assets/legacy/menu_imgs/mine.png","selectedIconPath":"assets/legacy/menu_imgs/mine_selected.png"}
+  ]},
+  "sitemapLocation":"sitemap.json"
+}

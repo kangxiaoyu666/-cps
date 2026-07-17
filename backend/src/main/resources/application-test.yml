@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: ${TEST_DB_URL:jdbc:mysql://localhost:3306/waimai_cps_test?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC}
+    username: ${TEST_DB_USERNAME:waimai}
+    password: ${TEST_DB_PASSWORD:change_me_for_local}
+  data:
+    redis:
+      host: ${TEST_REDIS_HOST:localhost}
+app:
+  session:
+    token-pepper: test-pepper-not-for-production-32-bytes
+  data:
+    encryption-key: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  affiliate:
+    encryption-key: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  mini:
+    default-tenant-code: demo
+  integration:
+    mock-enabled: true

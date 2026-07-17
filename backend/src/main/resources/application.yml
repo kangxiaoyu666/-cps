@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: waimai-cps-backend
+  profiles:
+    default: dev
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+      connection-timeout: 3000
+  flyway:
+    enabled: true
+    validate-migration-naming: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+  jackson:
+    time-zone: UTC
+    default-property-inclusion: non_null
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: ${COOKIE_SECURE:false}
+        same-site: strict
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+app:
+  session:
+    token-pepper: ${SESSION_TOKEN_PEPPER}
+    ttl-seconds: 604800
+  wechat:
+    app-id: ${WECHAT_APP_ID:}
+    app-secret: ${WECHAT_APP_SECRET:}
+  data:
+    encryption-key: ${DATA_ENCRYPTION_KEY:}
+  affiliate:
+    encryption-key: ${AFFILIATE_SECRET_KEY:}
+    sync:
+      enabled: ${AFFILIATE_SYNC_ENABLED:true}
+      fixed-delay-ms: ${AFFILIATE_SYNC_FIXED_DELAY_MS:300000}
+  mini:
+    default-tenant-code: ${DEFAULT_TENANT_CODE:}
+  integration:
+    mock-enabled: ${INTEGRATION_MOCK_ENABLED:false}
+  exports:
+    max-rows: 10000
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

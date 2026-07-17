@@ -1,0 +1,35 @@
+<view class="page">
+  <view wx:if="{{loading}}">
+    <view class="skeleton"></view>
+    <view class="skeleton" style="margin-top:20rpx"></view>
+  </view>
+  <view wx:elif="{{error}}" class="state">
+    加载失败
+    <button size="mini" bindtap="load">重试</button>
+  </view>
+  <block wx:else>
+    <view class="card">
+      <view class="title">{{title}}</view>
+      <view class="muted">{{subtitle}}</view>
+    </view>
+    <view class="platform">
+      <navigator url="/pages/meituan/index" class="platform-card">
+        <image src="/assets/legacy/images/takeout/logo-mt.png" />
+        <view>美团红包</view>
+      </navigator>
+      <navigator url="/pages/eleme/index" class="platform-card">
+        <image src="/assets/legacy/images/takeout/logo-elm.png" />
+        <view>饿了么红包</view>
+      </navigator>
+    </view>
+    <view class="card">
+      <view class="row">
+        <view>
+          <view>奖励规则透明</view>
+          <view class="muted">仅自购与一级直接邀请</view>
+        </view>
+        <image style="width:90rpx;height:90rpx" src="/assets/legacy/images/coupon.png" />
+      </view>
+    </view>
+  </block>
+</view>

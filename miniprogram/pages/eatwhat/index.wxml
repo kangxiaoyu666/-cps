@@ -1,0 +1,1 @@
+<view class="page"><view class="card" style="text-align:center;padding:100rpx 30rpx"><view class="muted">今天就吃</view><view class="title" style="font-size:68rpx;margin:30rpx">{{choice}}</view><button class="primary" bindtap="choose">帮我选一个</button></view></view>

@@ -1,0 +1,10 @@
+<view class="page">
+  <view class="card platform-detail">
+    <image class="platform-logo" src="/assets/legacy/images/takeout/logo-elm.png"/>
+    <view class="title">饿了么外卖红包</view>
+    <view class="muted">领取官方活动红包，订单归因以联盟数据为准</view>
+    <button class="primary" loading="{{loading}}" disabled="{{loading}}" bindtap="claim">{{loading ? '正在生成链接' : '领取红包'}}</button>
+    <view wx:if="{{errorMessage}}" class="error-message">{{errorMessage}}</view>
+  </view>
+  <view class="card"><view>说明</view><view class="muted">无法直接跳转时会复制官方推广链接，请粘贴到浏览器打开。</view></view>
+</view>

@@ -1,0 +1,19 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="skeleton"></view>
+  <view wx:elif="{{errorMessage}}" class="state">{{errorMessage}}<button size="mini" bindtap="load">重试</button></view>
+  <block wx:else>
+    <view class="card">
+      <view class="muted">可提现余额</view>
+      <view class="amount">¥ {{summary.availableCent / 100}}</view>
+      <view class="row muted"><text>冻结 ¥ {{summary.frozenCent / 100}}</text><text>累计 ¥ {{summary.lifetimeIncomeCent / 100}}</text></view>
+      <view wx:if="{{summary.debtCent > 0}}" class="debt-warning">待偿还欠款 ¥ {{summary.debtCent / 100}}，后续佣金将优先抵扣，欠款还清前不可提现。</view>
+    </view>
+    <navigator class="card row" url="/pages/withdrawals/index">申请提现<text>›</text></navigator>
+    <view class="section-title">最近流水</view>
+    <view wx:if="{{entries.length === 0}}" class="state">暂无钱包流水</view>
+    <view wx:for="{{entries}}" wx:key="business_no" class="card">
+      <view class="row"><text>{{item.business_type}}</text><text>{{item.available_delta_cent >= 0 ? '+' : ''}}{{item.available_delta_cent / 100}}</text></view>
+      <view class="muted">{{item.business_no}} · {{item.created_at}}</view>
+    </view>
+  </block>
+</view>

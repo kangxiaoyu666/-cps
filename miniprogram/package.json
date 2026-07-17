@@ -1,0 +1,11 @@
+{
+  "name": "waimai-cps-miniprogram",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "miniprogram-api-typings": "^3.12.3",
+    "typescript": "^5.8.3"
+  }
+}

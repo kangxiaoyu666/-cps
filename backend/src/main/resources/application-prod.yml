@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
+app:
+  session:
+    token-pepper: ${SESSION_TOKEN_PEPPER}
+  data:
+    encryption-key: ${DATA_ENCRYPTION_KEY}
+  affiliate:
+    encryption-key: ${AFFILIATE_SECRET_KEY}
+  mini:
+    default-tenant-code: ${DEFAULT_TENANT_CODE}
+  integration:
+    mock-enabled: false
+logging:
+  level:
+    root: INFO
+    com.waimaicps: INFO

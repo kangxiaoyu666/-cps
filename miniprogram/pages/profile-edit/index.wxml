@@ -1,0 +1,11 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="skeleton"></view>
+  <view wx:else class="card">
+    <view class="field-label">昵称</view>
+    <input value="{{nickname}}" maxlength="128" placeholder="请输入昵称" disabled="{{saving}}" bindinput="onNicknameInput"/>
+    <view class="field-label">头像地址（可选）</view>
+    <input value="{{avatarUrl}}" maxlength="512" placeholder="请输入 HTTPS 图片地址" disabled="{{saving}}" bindinput="onAvatarInput"/>
+    <button class="primary" loading="{{saving}}" disabled="{{saving}}" bindtap="save">{{saving ? '正在保存' : '保存资料'}}</button>
+    <view wx:if="{{errorMessage}}" class="error-message">{{errorMessage}}</view>
+  </view>
+</view>

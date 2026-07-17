@@ -1,0 +1,21 @@
+<view class="page">
+  <view class="card">
+    <view class="title">人工提现</view>
+    <view class="muted">最低提现 10 元，提交后冻结余额，由管理员审核并线下付款。</view>
+    <view class="field-label">提现金额（元）</view>
+    <input type="digit" maxlength="12" value="{{amountYuan}}" placeholder="请输入金额" disabled="{{submitting || cancelingId}}" bindinput="onAmountInput"/>
+    <button class="primary" loading="{{submitting}}" disabled="{{submitting || cancelingId}}" bindtap="submit">{{submitting ? '正在提交' : '申请提现'}}</button>
+    <view wx:if="{{errorMessage}}" class="error-message">{{errorMessage}}</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="skeleton"></view>
+  <view wx:elif="{{errorMessage && items.length === 0}}" class="state">加载失败<button size="mini" bindtap="load">重试</button></view>
+  <view wx:elif="{{items.length === 0}}" class="state">暂无提现记录</view>
+  <view wx:else>
+    <view wx:for="{{items}}" wx:key="id" class="card withdrawal-item">
+      <view class="row"><view>{{item.withdrawal_no}}</view><view class="status">{{item.status}}</view></view>
+      <view class="amount">¥ {{item.amount_cent / 100}}</view>
+      <button wx:if="{{item.status === 'SUBMITTED'}}" size="mini" class="cancel-button" loading="{{cancelingId === item.id}}" disabled="{{submitting || cancelingId}}" data-id="{{item.id}}" bindtap="cancel">取消提现</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,12 @@
+.git
+.gitignore
+**/.DS_Store
+**/.env
+**/.env.*
+**/node_modules
+**/dist
+backend/target
+admin-web
+miniprogram
+infra/backups
+*.log

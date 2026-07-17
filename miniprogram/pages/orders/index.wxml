@@ -1,0 +1,13 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="skeleton"></view>
+  <view wx:elif="{{errorMessage}}" class="state">{{errorMessage}}<button size="mini" bindtap="load">重试</button></view>
+  <view wx:elif="{{items.length === 0}}" class="state">暂无订单，领取红包并完成下单后请稍候同步。</view>
+  <view wx:else>
+    <view wx:for="{{items}}" wx:key="external_order_id" class="card">
+      <view class="row"><text>{{item.platform}}</text><text class="status">{{item.status}}</text></view>
+      <view class="order-no">{{item.external_order_id}}</view>
+      <view class="row muted"><text>订单 ¥ {{item.order_amount_cent / 100}}</text><text>佣金 ¥ {{item.settled_commission_cent / 100}}</text></view>
+      <view class="muted">{{item.paid_at || '等待支付时间同步'}}</view>
+    </view>
+  </view>
+</view>

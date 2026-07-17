@@ -1,0 +1,10 @@
+{
+  "name": "waimai-cps-monorepo",
+  "private": true,
+  "workspaces": ["admin-web"],
+  "scripts": {
+    "lint": "npm --workspace admin-web run lint",
+    "build": "npm --workspace admin-web run build",
+    "format:check": "npm --workspace admin-web run format:check"
+  }
+}

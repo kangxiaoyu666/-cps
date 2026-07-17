@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/waimai_cps?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC}
+    username: ${DB_USERNAME:waimai}
+    password: ${DB_PASSWORD:change_me_for_local}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+app:
+  session:
+    token-pepper: ${SESSION_TOKEN_PEPPER:dev-only-pepper-change-before-sharing}
+  data:
+    encryption-key: ${DATA_ENCRYPTION_KEY:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+  affiliate:
+    encryption-key: ${AFFILIATE_SECRET_KEY:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+    meituan:
+      link-endpoint: ${MEITUAN_LINK_ENDPOINT:http://localhost:8090/cps_open/common/api/v1/get_referral_link}
+      order-endpoint: ${MEITUAN_ORDER_ENDPOINT:http://localhost:8090/cps_open/common/api/v1/query_order}
+    eleme:
+      endpoint: ${ELEME_ENDPOINT:http://localhost:8090/router/rest}
+  mini:
+    default-tenant-code: ${DEFAULT_TENANT_CODE:demo}
+  integration:
+    mock-enabled: ${INTEGRATION_MOCK_ENABLED:true}
+  dev-seed:
+    enabled: ${DEV_SEED_ENABLED:true}
+    admin-password: ${DEV_ADMIN_PASSWORD:DemoAdmin123!}
+logging:
+  level:
+    com.waimaicps: DEBUG
