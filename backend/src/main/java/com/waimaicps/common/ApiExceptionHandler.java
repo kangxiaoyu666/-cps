@@ -16,7 +16,8 @@ public class ApiExceptionHandler {
             case "UNAUTHORIZED", "INVALID_CREDENTIALS" -> HttpStatus.UNAUTHORIZED;
             case "FORBIDDEN", "TENANT_CONTEXT_REQUIRED" -> HttpStatus.FORBIDDEN;
             case "ORDER_NOT_FOUND", "WITHDRAWAL_NOT_FOUND", "USER_NOT_FOUND", "TENANT_NOT_FOUND" -> HttpStatus.NOT_FOUND;
-            case "DUPLICATE_OPERATION", "SETTLEMENT_CONFLICT", "WITHDRAWAL_CONFLICT", "JOB_ALREADY_RUNNING" -> HttpStatus.CONFLICT;
+            case "DUPLICATE_OPERATION", "SETTLEMENT_CONFLICT", "REVERSAL_CONFLICT", "WITHDRAWAL_CONFLICT",
+                    "JOB_ALREADY_RUNNING" -> HttpStatus.CONFLICT;
             case "LOGIN_RATE_LIMITED" -> HttpStatus.TOO_MANY_REQUESTS;
             default -> HttpStatus.BAD_REQUEST;
         };

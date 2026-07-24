@@ -59,7 +59,12 @@ public class CommissionReversalService {
                     commission.rate, -amount, commission.id, businessNo);
             ledger.applyReversal(tenantId, commission.userId, businessNo,
                     "commission-reversal:" + commission.id, amount, orderId);
-            jdbc.update("UPDATE commission_record SET status='REVERSED' WHERE id=?", commission.id);
+            int updated = jdbc.update(
+                    "UPDATE commission_record SET status='REVERSED' WHERE tenant_id=? AND id=? AND status='CREDITED'",
+                    tenantId, commission.id);
+            if (updated != 1) {
+                throw new BusinessException("REVERSAL_CONFLICT", "佣金记录已被其他任务冲正");
+            }
         }
         markProcessed(tenantId, orderId);
     }

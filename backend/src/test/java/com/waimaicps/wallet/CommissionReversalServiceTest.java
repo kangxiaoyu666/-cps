@@ -2,6 +2,7 @@ package com.waimaicps.wallet;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -42,6 +43,8 @@ class CommissionReversalServiceTest {
         when(jdbc.query(anyString(), any(RowMapper.class), eq(1L), eq(9L)))
                 .thenAnswer(invocation -> List.of(((RowMapper<?>) invocation.getArgument(1))
                         .mapRow(commissionRs, 0)));
+        when(jdbc.update(contains("UPDATE commission_record"), eq(1L), eq(11L)))
+                .thenReturn(1);
 
         new CommissionReversalService(jdbc, ledger).reverseIfRefunded(1, 9);
 

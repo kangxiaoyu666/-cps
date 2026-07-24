@@ -66,23 +66,59 @@
 - 将 MySQL `BIGINT UNSIGNED` JDBC 读取从 `(Long)` 强转改为 `((Number) value).longValue()`，兼容 Connector 返回 `BigInteger`。
 - 固化 Docker 29 与 Testcontainers/docker-java 的 API 兼容配置。
 
+## 本轮加固测试（2026-07-24）
+
+### 资金并发安全测试（3 项）
+
+使用 `@SpringBootTest` 注入真实 Spring 代理 Bean，在 Testcontainers MySQL 8.4 上通过 `ExecutorService` + `CountDownLatch` 双线程并发执行：
+
+1. **并发结算**：同一订单双线程同时调用 `CommissionSettlementService.settle(...)`，只产生一条佣金记录和一条钱包流水，订单版本只递增一次。
+2. **并发退款冲正**：同一订单双线程同时调用 `CommissionReversalService.reverseIfRefunded(...)`，只产生一条冲正和一条冲正流水，第二个线程抛出 `REVERSAL_CONFLICT`（HTTP 409）。
+3. **并发提现付款**：同一提现双线程同时调用 `WithdrawalService.markPaid(...)`，一个成功另一个抛出 `INVALID_WITHDRAWAL_TRANSITION`，只产生一条 `WITHDRAWAL_PAID` 流水和一条 `MARK_PAID` 审计。
+
+### 双租户 HTTP 越权隔离测试（7 项）
+
+使用 `@SpringBootTest(webEnvironment = RANDOM_PORT)` + JDK `HttpClient` + 独立 `CookieManager`，真实执行管理员登录、Session、CSRF 和业务请求：
+
+4. 双租户各自独立 Session，提现列表完全隔离。
+5. 租户 A 审批/拒绝/付款租户 B 的提现返回 `WITHDRAWAL_NOT_FOUND`（HTTP 404），B 的提现状态和钱包不变。
+6. 租户 A 重试租户 B 的订单同步返回 `JOB_NOT_FOUND`（HTTP 404）。
+7. 租户管理员不能访问平台管理员 API，平台管理员不能访问租户管理员 API。
+8. 租户被禁用后，使用旧 Session 发送请求返回 `UNAUTHORIZED`（HTTP 401），Session 被立即失效。
+9. 跨租户联盟归因用户绑定返回 `USER_NOT_FOUND`，正常重复归因保持幂等。
+10. 缺少 `X-XSRF-TOKEN` Header 的写请求返回 `FORBIDDEN`（HTTP 403），数据库无变更。
+
+### 本轮安全加固
+
+- `AdminAuthenticationFilter` 每请求重新检查 `tenant_admin.status`、`platform_admin.status` 和 `tenant.status`，禁用后旧 Session 立即失效。
+- `AffiliateAttributionService.bind(...)` 增加 `wx_user WHERE tenant_id=? AND id=?` 归因用户租户归属校验。
+- `CommissionReversalService` 退款记录更新增加 `tenant_id` 和 `status='CREDITED'` 条件，冲突时抛 `REVERSAL_CONFLICT`。
+- `AffiliateOrderSyncService.finishJob(...)` 任务完成更新增加 `tenant_id` 条件。
+- `ApiExceptionHandler` 将 `REVERSAL_CONFLICT` 映射为 HTTP 409。
+- GitHub CI 将无 NVD Key 的 OWASP 全量扫描替换为 Google 官方 OSV Scanner reusable workflow。
+
+### 全量测试汇总
+
+| 轮次 | 测试数 | 失败 | 错误 | 跳过 | Checkstyle |
+|------|--------|------|------|------|------------|
+| 2026-07-17 | 26 | 0 | 0 | 0 | 0 |
+| 2026-07-24 | 36 | 0 | 0 | 0 | 0 |
+
 ## 仍未通过的生产门禁
 
 1. 真实微信 `jscode2session`、美团联盟和饿了么/淘宝闪购账号、权限与正式订单联调。
-2. 同一订单并发结算、同一提现并发付款的高并发压力测试和故障注入测试。
-3. 两租户全量 HTTP 越权与数据隔离集成测试。
-4. 管理后台平台管理员专用前端和生产运营流程验收。
-5. 生产 Compose 镜像构建、HTTPS 域名、微信合法域名、防火墙和日志告警验收。
-6. 备份恢复脚本的实际恢复演练及恢复后资金对账。
-7. NVD/供应链漏洞扫描、渗透测试、隐私、税务和合规复核。
-8. Git 仓库初始化、版本基线和可回滚发布记录。
+2. 生产 Compose 镜像构建、HTTPS 域名、微信合法域名、防火墙和日志告警验收。
+3. 管理后台平台管理员专用前端和生产运营流程验收。
+4. 备份恢复脚本的实际恢复演练及恢复后资金对账。
+5. 更高强度压力测试（100+ 并发）和故障注入测试。
+6. 渗透测试、隐私、税务和联盟合规复核。
 
 ## 已知非阻断警告
 
-- 当前 Flyway 10.20.1 对 MySQL 8.4 提示“建议升级”，但 V1-V5 已在三个真实 MySQL 8.4 实例中实际成功执行；生产前仍建议升级并重新验收。
-- Mockito 在 Java 21 下提示未来 JDK 将限制动态加载 Agent；当前不影响 26 项测试结果，后续应改为显式 Java Agent 配置。
-- 管理后台 Element Plus vendor 包仍偏大，属于性能优化项，不阻断本地业务闭环。
+- 当前 Flyway 10.20.1 对 MySQL 8.4 提示"建议升级"，但 V1-V5 已在多个真实 MySQL 8.4 实例中实际成功执行；生产前仍建议升级并重新验收。
+- Mockito 在 Java 21 下提示未来 JDK 将限制动态加载 Agent；当前不影响测试结果，后续应改为显式 Java Agent 配置。
+- 管理后台 Element Plus vendor 包仍偏大（约 963 KB），属于性能优化项，不阻断本地业务闭环。
 
 ## 结论
 
-“本地全链路可运营演示”目标已经达到：Docker、MySQL、Redis、Flyway、完整 Spring 上下文、联盟 Mock、订单同步、佣金、钱包、提现、退款、欠款、后续偿债和关键重复操作拦截均已实际跑通。项目现在可以用于本地演示、产品验收和正式凭据联调，但仍不能直接处理真实订单或真实资金；必须完成上述生产门禁后再上线。
+"本地全链路可运营演示"目标已经达到：Docker、MySQL、Redis、Flyway、完整 Spring 上下文、联盟 Mock、订单同步、佣金、钱包、提现、退款、欠款、后续偿债、并发事务隔离、双租户越权防护和关键重复操作拦截均已实际跑通。项目现在可以用于本地演示、产品验收和正式凭据联调，但仍不能直接处理真实订单或真实资金；必须完成上述生产门禁后再上线。

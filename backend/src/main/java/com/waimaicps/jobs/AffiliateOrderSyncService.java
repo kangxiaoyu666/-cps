@@ -76,7 +76,7 @@ public class AffiliateOrderSyncService {
                 }
                 if (!page.hasMore()) {
                     completeCursor(tenantId, normalized, state.windowEnd);
-                    finishJob(jobId, "SUCCESS", scanned, succeeded, null, null);
+                    finishJob(tenantId, jobId, "SUCCESS", scanned, succeeded, null, null);
                     return new SyncResult(jobId, scanned, succeeded, false);
                 }
                 if (page.nextCursor() == null || page.nextCursor().equals(state.cursor)) {
@@ -85,11 +85,11 @@ public class AffiliateOrderSyncService {
                 saveCursor(tenantId, normalized, page.nextCursor(), state.windowStart, state.windowEnd);
                 state = new SyncCursor(page.nextCursor(), state.windowStart, state.windowEnd);
             }
-            finishJob(jobId, "PARTIAL", scanned, succeeded, null, "达到单次最大分页数，将从持久化游标继续");
+            finishJob(tenantId, jobId, "PARTIAL", scanned, succeeded, null, "达到单次最大分页数，将从持久化游标继续");
             return new SyncResult(jobId, scanned, succeeded, true);
         } catch (RuntimeException ex) {
             if (jobId != 0) {
-                finishJob(jobId, "FAILED", scanned, succeeded, errorCode(ex), safeMessage(ex));
+                finishJob(tenantId, jobId, "FAILED", scanned, succeeded, errorCode(ex), safeMessage(ex));
             }
             throw ex;
         } finally {
@@ -104,10 +104,10 @@ public class AffiliateOrderSyncService {
                 tenantId, normalized.name(), normalized.name() + ":ORDER:" + externalOrderId + ":" + UUID.randomUUID());
         try {
             persistAndProcess(tenantId, normalized, payload);
-            finishJob(jobId, "SUCCESS", 1, 1, null, null);
+            finishJob(tenantId, jobId, "SUCCESS", 1, 1, null, null);
             return new SyncResult(jobId, 1, 1, false);
         } catch (RuntimeException ex) {
-            finishJob(jobId, "FAILED", 1, 0, errorCode(ex), safeMessage(ex));
+            finishJob(tenantId, jobId, "FAILED", 1, 0, errorCode(ex), safeMessage(ex));
             throw ex;
         }
     }
@@ -267,10 +267,22 @@ public class AffiliateOrderSyncService {
                 Long.class, tenantId, executionKey);
     }
 
-    private void finishJob(long jobId, String status, int scanned, int success, String code, String message) {
-        jdbc.update("UPDATE job_execution SET status=?,finished_at=UTC_TIMESTAMP(6),scanned_count=?,"
-                        + "success_count=?,failure_count=?,error_code=?,error_message=? WHERE id=?",
-                status, scanned, success, Math.max(scanned - success, 0), code, message, jobId);
+    private void finishJob(
+            long tenantId,
+            long jobId,
+            String status,
+            int scanned,
+            int success,
+            String code,
+            String message) {
+        int updated = jdbc.update(
+                "UPDATE job_execution SET status=?,finished_at=UTC_TIMESTAMP(6),scanned_count=?,"
+                        + "success_count=?,failure_count=?,error_code=?,error_message=? "
+                        + "WHERE tenant_id=? AND id=?",
+                status, scanned, success, Math.max(scanned - success, 0), code, message, tenantId, jobId);
+        if (updated != 1) {
+            throw new BusinessException("JOB_NOT_FOUND", "订单同步任务不存在");
+        }
     }
 
     private void releaseLock(String key, String expected) {
