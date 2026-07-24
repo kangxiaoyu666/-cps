@@ -17,7 +17,7 @@ jobs:
       - run: mvn -B -f backend/pom.xml test package
       - run: mvn -B -f backend/pom.xml checkstyle:check
   dependency-scan:
-    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.3.4
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.3.8
   admin-web:
     runs-on: ubuntu-latest
     steps:
